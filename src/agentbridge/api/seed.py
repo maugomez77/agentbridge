@@ -66,7 +66,8 @@ paths:
 async def seed_demo():
     ensure_dirs()
     existing = store.get_project("Demo Store API")
-    if existing and store.list_artifacts(existing.id):
+    artifacts = store.list_artifacts(project.id)
+    if artifacts and any(a.status == "ready" for a in artifacts):
         return
 
     project = existing or store.create_project(

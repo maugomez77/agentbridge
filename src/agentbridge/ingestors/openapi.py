@@ -20,7 +20,12 @@ class OpenAPIIngestor(BaseIngestor):
     async def ingest(self, artifact: Artifact) -> tuple[Artifact, list[Endpoint]]:
         try:
             raw = artifact.raw_content or Path(artifact.source_path).read_text()
-            spec = yaml.safe_load(raw) if artifact.source_path and artifact.source_path.endswith((".yaml", ".yml")) else __import__("json").loads(raw)
+            is_yaml = (
+                (artifact.source_path and artifact.source_path.endswith((".yaml", ".yml")))
+                or raw.strip().startswith(("openapi:", "swagger:", "---"))
+                or "openapi:" in raw[:100]
+            )
+            spec = yaml.safe_load(raw) if is_yaml else __import__("json").loads(raw)
             endpoints = []
             base_path = spec.get("basePath", "")
             for path, methods in spec.get("paths", {}).items():
