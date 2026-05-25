@@ -1,31 +1,84 @@
-from pathlib import Path
 from agentbridge.config import ensure_dirs
 from agentbridge.db import store
 from agentbridge.models.artifact import Artifact, ArtifactType
 from agentbridge.ingestors import get_ingestor
 
 
+_DEMO_SPEC = """openapi: 3.0.3
+info:
+  title: Fake Store API
+  version: 1.0.0
+  description: Free fake REST API for testing — products, carts, users
+servers:
+  - url: https://fakestoreapi.com
+paths:
+  /products:
+    get:
+      summary: List all products
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of products
+  /products/{id}:
+    get:
+      summary: Get a single product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product details
+  /carts:
+    get:
+      summary: List all carts
+      responses:
+        '200':
+          description: List of carts
+  /carts/{id}:
+    get:
+      summary: Get a single cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cart details
+  /users:
+    get:
+      summary: List all users
+      responses:
+        '200':
+          description: List of users
+"""
+
+
 async def seed_demo():
     ensure_dirs()
     existing = store.get_project("Demo Store API")
-    if existing:
+    if existing and store.list_artifacts(existing.id):
         return
 
-    project = store.create_project(
+    project = existing or store.create_project(
         name="Demo Store API",
         base_url="https://fakestoreapi.com",
     )
-    sample = Path(__file__).parent.parent.parent.parent / "templates" / "sample-openapi.yaml"
-    if not sample.exists():
-        return
 
-    content = sample.read_text()
     artifact = Artifact(
         project_id=project.id,
-        name=sample.name,
+        name="sample-openapi.yaml",
         type=ArtifactType.openapi,
-        source_path=str(sample),
-        raw_content=content,
+        raw_content=_DEMO_SPEC,
     )
     store.create_artifact(artifact)
 
