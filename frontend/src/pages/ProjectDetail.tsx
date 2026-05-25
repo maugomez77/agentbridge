@@ -132,13 +132,14 @@ export default function ProjectDetail() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                <label htmlFor="file-upload" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                   Upload file
                 </label>
-                <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/30 transition-colors cursor-pointer">
+                <div className="relative flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/30 transition-colors">
                   <input
+                    id="file-upload"
                     type="file"
-                    className="hidden"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".yaml,.yml,.json,.java,.proto,.wsdl,.sql,.prisma,.graphql,.gql"
                     onChange={e => {
                       const f = e.target.files?.[0]
@@ -161,7 +162,7 @@ export default function ProjectDetail() {
                       <p className="text-[10px] text-slate-400 mt-1">.yaml .json .java .proto .wsdl .sql .prisma</p>
                     </div>
                   )}
-                </label>
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
