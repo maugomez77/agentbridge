@@ -23,6 +23,30 @@ agentbridge serve                    # Start MCP server
 agentbridge dashboard                # Open web UI
 ```
 
+## Monetization Tiers
+
+| Feature | Free | Pro ($29/mo) | Enterprise ($99/mo) |
+|---------|------|-------------|-------------------|
+| Endpoints | 3 | 50 | Unlimited |
+| Teams | 1 | 5 | Unlimited |
+| MCP Endpoints | Public only | Private | Private |
+| Custom Branding | No | Yes | Yes |
+| SSO / SAML | No | No | Yes |
+| Audit Logs | No | No | Yes |
+| Priority Support | No | No | Yes |
+
+## Authentication
+
+- **JWT** — Bearer tokens via `/api/auth/login` and `/api/auth/register`
+- **API Keys** — Programmatic access via `X-API-Key` header (`/api/auth/api-keys`)
+- **Neon PostgreSQL** — Persistent user, team, subscription, and usage data (file-based fallback when no DATABASE_URL)
+
+## Deployment
+
+- **Frontend** — Vercel (`frontend/` via `vercel.json`)
+- **Backend** — Render Docker (`src/agentbridge/api/main.py:app`)
+- **Database** — Neon PostgreSQL (pass `DATABASE_URL` env var; defaults to JSON files)
+
 ## Supported Artifacts (8 types)
 
 | Type | Files | Extracts |
@@ -54,3 +78,25 @@ Each project exposes:
   }
 }
 ```
+
+## API Endpoints
+
+### Auth
+- `POST /api/auth/register` — Create account
+- `POST /api/auth/login` — Get JWT token
+- `GET /api/auth/me` — Get current user
+- `POST /api/auth/api-keys` — Generate API key
+- `DELETE /api/auth/api-keys` — Revoke API key
+
+### Billing
+- `GET /api/billing/subscription` — Get current subscription
+- `GET /api/billing/tiers` — List all tiers
+- `POST /api/billing/upgrade` — Upgrade tier
+- `POST /api/billing/downgrade` — Downgrade to free
+- `POST /api/billing/cancel` — Cancel subscription
+
+### Projects & Artifacts
+- `GET/POST /api/projects` — Project CRUD
+- `POST /api/artifacts` — Ingest API spec
+- `GET /api/endpoints/by-project/:id` — Get MCP tools
+- `GET /api/status` — Overall stats

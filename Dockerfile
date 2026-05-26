@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir
 
 EXPOSE 8080
 
-CMD ["uvicorn", "spec2mcp.api.server:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "agentbridge.api.main:app", "--host", "0.0.0.0", "--port", "8080"]
