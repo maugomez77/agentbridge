@@ -203,9 +203,24 @@ async def llms_txt():
     lines.append("```json")
     lines.append('{"mcpServers": {"agentbridge": {"url": "' + base_url + '/mcp/"}}}')
     lines.append("```")
-    lines.append("")
-    lines.append("Health check: GET /health")
-    lines.append("API docs: /docs (Swagger) or /redoc (ReDoc)")
 
     from fastapi.responses import PlainTextResponse
     return PlainTextResponse("\n".join(lines), media_type="text/plain; charset=utf-8")
+
+
+@app.get("/projects/{project_id}/llms.txt", include_in_schema=False)
+async def project_llms_txt(project_id: str):
+    """Generate llms.txt from ingested specs for a specific project."""
+    from agentbridge.generators.llms_txt import generate_llms_txt
+
+    proj = store.get_project_by_id(project_id)
+    if not proj:
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse("# Project not found\n", media_type="text/plain; charset=utf-8", status_code=404)
+
+    endpoints = store.get_endpoints_by_project(project_id)
+    mcp_url = settings.host if hasattr(settings, 'host') else "https://agentbridge-demo.onrender.com"
+    text = generate_llms_txt(proj, endpoints, base_url=mcp_url)
+
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(text, media_type="text/plain; charset=utf-8")
